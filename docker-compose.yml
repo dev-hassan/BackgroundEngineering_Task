@@ -1,0 +1,43 @@
+# version: '3.8'
+
+services:
+  appservice:
+    image: ${DOCKER_REGISTRY-}appservice
+    build:
+      context: ./AppService
+      dockerfile: Dockerfile
+    ports:
+      - "5003:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - StorageService__BaseUrl=http://storage-service:8080
+      - JWT__SecretKey=JWTTokenGeneration123!
+      - JWT__Issuer=AppService
+      - JWT__Audience=StorageService
+    depends_on:
+      - storageservice
+    networks:
+      - microservices-network
+
+  storageservice:
+    build:
+      context: ./StorageService
+      dockerfile: Dockerfile
+    ports:
+      - "5004:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - JWT__SecretKey=YourSuperSecretKeyForJWTTokenGeneration123!
+      - JWT__Issuer=AppService
+      - JWT__Audience=StorageService
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
+
+volumes:
+  uploads:
