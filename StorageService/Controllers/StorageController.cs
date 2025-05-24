@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StorageService.Interfaces;
 using StorageService.Models;
-using StorageService.Services;
 
 namespace StorageService.Controllers;
 
@@ -12,15 +11,17 @@ public class StorageController : ControllerBase
     private readonly IFileStorageService _fileStorageService;
     private readonly ISignatureService _signatureService;
     private readonly ILogger<StorageController> _logger;
+    private readonly IConfiguration _configuration;
 
     public StorageController(
         IFileStorageService fileStorageService,
         ISignatureService signatureService,
-        ILogger<StorageController> logger)
+        ILogger<StorageController> logger, IConfiguration configuration)
     {
         _fileStorageService = fileStorageService;
         _signatureService = signatureService;
         _logger = logger;
+        _configuration = configuration;
     }
 
     [HttpPost("presigned-url")]
@@ -43,7 +44,7 @@ public class StorageController : ControllerBase
 
             // Generate pre-signed URL and token
             var metadata = _fileStorageService.CreateUploadMetadata(request);
-            var uploadUrl = $"{Request.Scheme}://{Request.Host}/api/storage/upload/{metadata.Id}";
+            var uploadUrl = $"{_configuration.GetValue<string>("BaseUrl")}/api/storage/upload/{metadata.Id}";
 
             var response = new PreSignedUrlResponse
             {

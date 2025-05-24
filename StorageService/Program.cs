@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.OpenApi.Models;
 using StorageService.Interfaces;
 using StorageService.Services;
@@ -28,6 +29,14 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
+
 var app = builder.Build();
 
 // Ensure upload directory exists
@@ -36,6 +45,8 @@ if (!Directory.Exists(uploadPath))
 {
     Directory.CreateDirectory(uploadPath);
 }
+
+app.UseForwardedHeaders();
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
@@ -47,6 +58,7 @@ if (app.Environment.IsDevelopment())
         //c.RoutePrefix = string.Empty;
     });
 }
+
 
 app.MapControllers();
 
