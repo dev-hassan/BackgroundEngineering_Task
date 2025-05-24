@@ -1,8 +1,7 @@
-# version: '3.8'
+version: '3.8'
 
 services:
   appservice:
-    image: ${DOCKER_REGISTRY-}appservice
     build:
       context: ./AppService
       dockerfile: Dockerfile
@@ -10,8 +9,9 @@ services:
       - "5003:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - StorageService__BaseUrl=http://storage-service:8080
-      - JWT__SecretKey=JWTTokenGeneration123!
+      - ASPNETCORE_URLS=http://+:8080
+      - StorageService__BaseUrl=http://storageservice:8080
+      - JWT__SecretKey=cdbdbb15e797a4d0844da624d7d3e2344b03dc974b15788e0643508eade0028673dcbc738dbc911d82e1ed04e750a39dae2e10e336c8124d0484412c355e3a8e0663d780083fd95762550238973a274e6f4dc42eab285cd0bf003af72927d4f934b40459291395a85deadb005d3ed40311f2136acfc58469dafd7cd7cc6e3f21c347c47b158bd65b25358fba78a242a00c8b09c0b925b8bebfe69522bd8880001b0dd51490bfc3143961983415e753e1bc569ad0b428ddf8879a17bf0b1897224154cb645368a6ca8b68dad2c0aedc5763d69e1a9943942e4c505ddc435449f4e31ad9a5a9195f53a1256c6655ac8c4ce76955edebde2a80130e07211a5bcb36
       - JWT__Issuer=AppService
       - JWT__Audience=StorageService
     depends_on:
@@ -27,7 +27,8 @@ services:
       - "5004:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - JWT__SecretKey=YourSuperSecretKeyForJWTTokenGeneration123!
+      - ASPNETCORE_URLS=http://+:8080
+      - JWT__SecretKey=cdbdbb15e797a4d0844da624d7d3e2344b03dc974b15788e0643508eade0028673dcbc738dbc911d82e1ed04e750a39dae2e10e336c8124d0484412c355e3a8e0663d780083fd95762550238973a274e6f4dc42eab285cd0bf003af72927d4f934b40459291395a85deadb005d3ed40311f2136acfc58469dafd7cd7cc6e3f21c347c47b158bd65b25358fba78a242a00c8b09c0b925b8bebfe69522bd8880001b0dd51490bfc3143961983415e753e1bc569ad0b428ddf8879a17bf0b1897224154cb645368a6ca8b68dad2c0aedc5763d69e1a9943942e4c505ddc435449f4e31ad9a5a9195f53a1256c6655ac8c4ce76955edebde2a80130e07211a5bcb36
       - JWT__Issuer=AppService
       - JWT__Audience=StorageService
     volumes:
@@ -38,6 +39,3 @@ services:
 networks:
   microservices-network:
     driver: bridge
-
-volumes:
-  uploads:
